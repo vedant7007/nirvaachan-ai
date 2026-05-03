@@ -15,7 +15,7 @@ interface TimelineCardProps {
 }
 
 export const TimelineCard: React.FC<TimelineCardProps> = ({ step, index }) => {
-  const { ref, isInView } = useInView({ threshold: 0.2 });
+  const { ref, isInView } = useInView<HTMLDivElement>({ threshold: 0.2 });
   const isEven = index % 2 === 0;
 
   return (

@@ -7,7 +7,12 @@ export interface LocationData {
   isLoading: boolean;
 }
 
-export function useGeolocation() {
+interface UseGeolocationReturn {
+  location: LocationData;
+  getLocation: () => void;
+}
+
+export function useGeolocation(): UseGeolocationReturn {
   const [location, setLocation] = useState<LocationData>({
     latitude: null,
     longitude: null,
@@ -37,23 +42,17 @@ export function useGeolocation() {
           isLoading: false,
         });
       },
-      (error) => {
-        let errorMessage = "Unable to retrieve your location.";
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage = "Location access was denied. Please enable permissions.";
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = "Location information is unavailable.";
-            break;
-          case error.TIMEOUT:
-            errorMessage = "The request to get user location timed out.";
-            break;
-        }
+      (err) => {
+        const errorMessages: Record<number, string> = {
+          [err.PERMISSION_DENIED]: "Location access was denied. Please enable permissions or use manual selection.",
+          [err.POSITION_UNAVAILABLE]: "Location information is unavailable. Please use manual selection.",
+          [err.TIMEOUT]: "The request to get your location timed out. Please try again.",
+        };
+
         setLocation({
           latitude: null,
           longitude: null,
-          error: errorMessage,
+          error: errorMessages[err.code] || "Unable to retrieve your location.",
           isLoading: false,
         });
       },

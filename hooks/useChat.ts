@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { sanitizeInput } from "@/lib/sanitize";
 
 export interface ChatMessage {
@@ -8,10 +8,22 @@ export interface ChatMessage {
   timestamp: Date;
 }
 
-export function useChat() {
+interface UseChatReturn {
+  messages: ChatMessage[];
+  isLoading: boolean;
+  error: string | null;
+  sendMessage: (text: string) => Promise<void>;
+  clearHistory: () => void;
+}
+
+export function useChat(): UseChatReturn {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const messagesRef = useRef<ChatMessage[]>([]);
+
+  // Keep ref in sync for stable callback
+  messagesRef.current = messages;
 
   const sendMessage = useCallback(async (text: string) => {
     const sanitizedText = sanitizeInput(text);
@@ -34,7 +46,7 @@ export function useChat() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: sanitizedText,
-          history: messages.map(({ role, content }) => ({ role, content })),
+          history: messagesRef.current.map(({ role, content }) => ({ role, content })),
         }),
       });
 
@@ -46,7 +58,7 @@ export function useChat() {
       }
 
       const data = await response.json();
-      
+
       const aiMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: "model",
@@ -55,18 +67,15 @@ export function useChat() {
       };
 
       setMessages((prev) => [...prev, aiMessage]);
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred.");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "An unexpected error occurred.";
+      setError(message);
     } finally {
       setIsLoading(false);
     }
-  }, [messages]);
+  }, []);
 
-  return {
-    messages,
-    isLoading,
-    error,
-    sendMessage,
-    clearHistory: () => setMessages([]),
-  };
+  const clearHistory = useCallback(() => setMessages([]), []);
+
+  return { messages, isLoading, error, sendMessage, clearHistory };
 }

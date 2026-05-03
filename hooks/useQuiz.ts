@@ -1,8 +1,25 @@
 import { useState, useCallback } from "react";
 import { quizQuestions, QuizQuestion } from "@/data/quiz";
 
-export function useQuiz() {
-  const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard" | null>(null);
+type Difficulty = "easy" | "medium" | "hard";
+
+interface UseQuizReturn {
+  difficulty: Difficulty | null;
+  currentQuestion: QuizQuestion | undefined;
+  currentQuestionIndex: number;
+  totalQuestions: number;
+  selectedAnswers: Record<number, number>;
+  isFinished: boolean;
+  startQuiz: (level: Difficulty) => void;
+  answerQuestion: (questionId: number, optionIndex: number) => void;
+  nextQuestion: () => void;
+  calculateScore: () => number;
+  reset: () => void;
+  allQuestions: QuizQuestion[];
+}
+
+export function useQuiz(): UseQuizReturn {
+  const [difficulty, setDifficulty] = useState<Difficulty | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({});
   const [isFinished, setIsFinished] = useState(false);
@@ -11,7 +28,7 @@ export function useQuiz() {
     ? quizQuestions.filter((q) => q.difficulty === difficulty)
     : [];
 
-  const startQuiz = useCallback((level: "easy" | "medium" | "hard") => {
+  const startQuiz = useCallback((level: Difficulty) => {
     setDifficulty(level);
     setCurrentQuestionIndex(0);
     setSelectedAnswers({});
@@ -19,10 +36,7 @@ export function useQuiz() {
   }, []);
 
   const answerQuestion = useCallback((questionId: number, optionIndex: number) => {
-    setSelectedAnswers((prev) => ({
-      ...prev,
-      [questionId]: optionIndex,
-    }));
+    setSelectedAnswers((prev) => ({ ...prev, [questionId]: optionIndex }));
   }, []);
 
   const nextQuestion = useCallback(() => {
@@ -34,14 +48,12 @@ export function useQuiz() {
   }, [currentQuestionIndex, filteredQuestions.length]);
 
   const calculateScore = useCallback(() => {
-    let score = 0;
-    filteredQuestions.forEach((q) => {
-      if (selectedAnswers[q.id] === q.correctIndex) {
-        score++;
-      }
-    });
-    return score;
+    return filteredQuestions.reduce((score, q) => {
+      return score + (selectedAnswers[q.id] === q.correctIndex ? 1 : 0);
+    }, 0);
   }, [filteredQuestions, selectedAnswers]);
+
+  const reset = useCallback(() => setDifficulty(null), []);
 
   return {
     difficulty,
@@ -54,7 +66,7 @@ export function useQuiz() {
     answerQuestion,
     nextQuestion,
     calculateScore,
-    reset: () => setDifficulty(null),
+    reset,
     allQuestions: filteredQuestions,
   };
 }

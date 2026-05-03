@@ -11,7 +11,7 @@ interface StatItemProps {
 }
 
 const StatItem: React.FC<StatItemProps> = ({ end, suffix = "", label, duration = 2000 }) => {
-  const { ref, isInView } = useInView({ threshold: 0.5 });
+  const { ref, isInView } = useInView<HTMLDivElement>({ threshold: 0.5 });
   const [count, setCount] = useState(0);
 
   useEffect(() => {

@@ -1,37 +1,59 @@
+/**
+ * Sliding window rate limiter.
+ * Tracks request timestamps per key (IP) and enforces
+ * a maximum number of requests within a rolling time window.
+ */
 export class RateLimiter {
-  private windowMs: number;
-  private maxRequests: number;
-  private requests: Map<string, number[]>;
+  private readonly windowMs: number;
+  private readonly maxRequests: number;
+  private readonly requests: Map<string, number[]>;
 
-  constructor(windowMs = 60000, maxRequests = 20) {
+  constructor(windowMs = 60_000, maxRequests = 20) {
     this.windowMs = windowMs;
     this.maxRequests = maxRequests;
     this.requests = new Map();
   }
 
-  check(ip: string): boolean {
+  /**
+   * Check if a request from the given key is allowed.
+   * Returns true if within rate limit, false if exceeded.
+   */
+  check(key: string): boolean {
     const now = Date.now();
     const windowStart = now - this.windowMs;
 
-    // Get existing timestamps for this IP
-    let timestamps = this.requests.get(ip) || [];
+    // Get timestamps within the current window
+    const timestamps = (this.requests.get(key) || []).filter(
+      (t) => t > windowStart
+    );
 
-    // Filter out timestamps older than the window
-    timestamps = timestamps.filter(timestamp => timestamp > windowStart);
-
-    // Check if within limit
     if (timestamps.length >= this.maxRequests) {
-      this.requests.set(ip, timestamps);
-      return false; // Rate limit exceeded
+      this.requests.set(key, timestamps);
+      return false;
     }
 
-    // Add new timestamp
     timestamps.push(now);
-    this.requests.set(ip, timestamps);
+    this.requests.set(key, timestamps);
 
-    return true; // Allowed
+    // Periodic cleanup: remove stale IPs to prevent memory leaks
+    if (this.requests.size > 1000) {
+      this.cleanup(windowStart);
+    }
+
+    return true;
+  }
+
+  private cleanup(windowStart: number): void {
+    this.requests.forEach((timestamps, key) => {
+      const active = timestamps.filter((t: number) => t > windowStart);
+      if (active.length === 0) {
+        this.requests.delete(key);
+      } else {
+        this.requests.set(key, active);
+      }
+    });
   }
 }
 
-// Global instance for the application
+/** Singleton rate limiter: 20 requests per minute per IP */
 export const rateLimiter = new RateLimiter();
