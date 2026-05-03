@@ -3,6 +3,8 @@
 @tailwind utilities;
 
 :root {
+  color-scheme: light;
+
   /* Primary — Saffron/Orange */
   --primary-50: #FFF7ED;
   --primary-100: #FFEDD5;
@@ -41,6 +43,8 @@
 }
 
 .dark {
+  color-scheme: dark;
+
   --primary-50: #431407;
   --primary-100: #7C2D12;
   --primary-500: #F97316;
@@ -74,6 +78,24 @@
 body {
   color: var(--text-primary);
   background: var(--bg-primary);
+}
+
+/* Ensure native form controls use theme colors in dark mode */
+.dark input,
+.dark select,
+.dark textarea {
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+}
+
+.dark select option {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 1;
 }
 
 @layer utilities {

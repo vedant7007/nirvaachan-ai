@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import { model, SYSTEM_PROMPT } from "@/lib/gemini";
 import { rateLimiter } from "@/lib/rate-limiter";
-import { sanitizeInput } from "@/lib/sanitize";
 
 export const dynamic = "force-dynamic";
+
+// Simple server-safe sanitizer (no jsdom dependency)
+function sanitize(input: string): string {
+  if (!input) return "";
+  return input.replace(/<[^>]*>/g, "").trim();
+}
 
 export async function POST(req: Request) {
   try {
@@ -24,7 +29,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Message is required" }, { status: 400 });
     }
 
-    const sanitizedMessage = sanitizeInput(message);
+    const sanitizedMessage = sanitize(message);
 
     // 3. Prepare Chat History
     const chatHistory = history ? history.map((msg: { role: string; content: string }) => ({
