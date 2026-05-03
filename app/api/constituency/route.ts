@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { model } from "@/lib/gemini";
 import { rateLimiter } from "@/lib/rate-limiter";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: Request) {
   try {
     const ip = req.headers.get("x-forwarded-for") || "anonymous";

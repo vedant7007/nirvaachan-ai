@@ -3,6 +3,8 @@ import { model, SYSTEM_PROMPT } from "@/lib/gemini";
 import { rateLimiter } from "@/lib/rate-limiter";
 import { sanitizeInput } from "@/lib/sanitize";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: Request) {
   try {
     // 1. Rate Limiting

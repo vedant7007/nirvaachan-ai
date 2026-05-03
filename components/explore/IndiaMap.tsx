@@ -4,37 +4,137 @@ import React, { useState } from "react";
 import { statesData, StateElectionData } from "@/data/states";
 import { StatePanel } from "./StatePanel";
 
+// Simplified but recognizable SVG paths for Indian states
+// ViewBox: 0 0 500 620, scaled to approximate geographic positions
 const statePathData: Record<string, { d: string; cx: number; cy: number }> = {
-  JK: { d: "M150,30 L180,20 L200,40 L190,70 L170,80 L150,60Z", cx: 170, cy: 50 },
-  HP: { d: "M190,75 L210,70 L220,90 L200,100 L185,90Z", cx: 200, cy: 85 },
-  PB: { d: "M165,85 L190,80 L195,100 L180,110 L160,100Z", cx: 175, cy: 95 },
-  UK: { d: "M215,75 L245,70 L250,90 L230,100 L215,90Z", cx: 232, cy: 85 },
-  HR: { d: "M170,105 L195,100 L200,120 L185,130 L165,120Z", cx: 182, cy: 115 },
-  DL: { d: "M185,118 L195,115 L198,125 L190,128Z", cx: 192, cy: 122 },
-  UP: { d: "M200,105 L270,95 L280,140 L240,160 L200,145Z", cx: 240, cy: 125 },
-  RJ: { d: "M100,110 L170,100 L175,160 L140,180 L90,160Z", cx: 135, cy: 140 },
-  GJ: { d: "M60,160 L110,150 L120,190 L90,220 L50,200Z", cx: 85, cy: 185 },
-  MP: { d: "M140,155 L230,145 L240,190 L170,200 L140,185Z", cx: 190, cy: 175 },
-  BR: { d: "M280,130 L330,125 L335,155 L290,160 L275,150Z", cx: 305, cy: 142 },
-  JH: { d: "M280,155 L325,150 L330,180 L290,185 L275,170Z", cx: 302, cy: 168 },
-  WB: { d: "M325,140 L350,130 L360,190 L340,210 L320,180Z", cx: 340, cy: 170 },
-  OR: { d: "M260,185 L320,175 L330,215 L280,225 L255,210Z", cx: 290, cy: 200 },
-  CT: { d: "M230,190 L270,185 L275,225 L240,230 L225,215Z", cx: 250, cy: 208 },
-  MH: { d: "M100,200 L180,190 L190,240 L140,270 L90,250Z", cx: 142, cy: 230 },
-  TS: { d: "M160,240 L220,230 L230,270 L180,280 L155,265Z", cx: 192, cy: 255 },
-  AP: { d: "M160,275 L235,265 L260,310 L200,330 L155,305Z", cx: 205, cy: 295 },
-  KA: { d: "M100,260 L160,250 L170,310 L130,340 L90,310Z", cx: 130, cy: 295 },
-  GA: { d: "M85,265 L105,260 L108,280 L88,285Z", cx: 96, cy: 272 },
-  KL: { d: "M105,320 L135,310 L140,370 L115,380 L100,355Z", cx: 122, cy: 348 },
-  TN: { d: "M130,310 L200,300 L210,360 L160,380 L130,355Z", cx: 168, cy: 340 },
-  AS: { d: "M370,110 L420,100 L430,125 L385,130 L365,120Z", cx: 398, cy: 115 },
-  NL: { d: "M420,115 L440,112 L442,128 L422,130Z", cx: 430, cy: 121 },
-  MN: { d: "M425,130 L445,128 L447,150 L427,152Z", cx: 436, cy: 140 },
-  MZ: { d: "M415,150 L435,148 L438,175 L418,177Z", cx: 426, cy: 163 },
-  TR: { d: "M400,155 L418,152 L420,172 L402,175Z", cx: 410, cy: 164 },
-  ML: { d: "M370,120 L400,115 L405,135 L375,138Z", cx: 388, cy: 127 },
-  SK: { d: "M340,105 L358,100 L360,115 L342,118Z", cx: 350, cy: 108 },
-  AR: { d: "M390,85 L430,80 L435,105 L395,108Z", cx: 412, cy: 95 },
+  // Northern States
+  JK: {
+    d: "M140,20 L175,12 L200,18 L215,40 L210,68 L198,82 L180,88 L162,80 L148,60 L138,40Z",
+    cx: 178, cy: 48,
+  },
+  HP: {
+    d: "M198,82 L218,74 L235,80 L238,98 L222,110 L205,108 L198,95Z",
+    cx: 218, cy: 93,
+  },
+  PB: {
+    d: "M155,88 L180,88 L198,95 L205,108 L192,118 L168,118 L152,108Z",
+    cx: 175, cy: 103,
+  },
+  UK: {
+    d: "M235,80 L258,72 L272,80 L270,98 L252,108 L238,98Z",
+    cx: 252, cy: 90,
+  },
+  HR: {
+    d: "M152,108 L168,118 L192,118 L210,120 L218,138 L210,152 L182,152 L158,140Z",
+    cx: 185, cy: 132,
+  },
+  DL: {
+    d: "M198,135 L210,132 L212,142 L200,145Z",
+    cx: 205, cy: 138,
+  },
+  // Large Northern States
+  RJ: {
+    d: "M55,148 L110,132 L152,108 L158,140 L182,152 L182,200 L158,240 L120,258 L72,252 L42,218 L38,178Z",
+    cx: 108, cy: 192,
+  },
+  UP: {
+    d: "M210,108 L252,108 L270,98 L305,105 L318,118 L312,152 L298,172 L262,185 L228,185 L210,200 L182,200 L182,152 L210,152 L218,138 L210,120Z",
+    cx: 248, cy: 148,
+  },
+  // Western State
+  GJ: {
+    d: "M22,195 L38,178 L55,148 L72,158 L72,252 L52,278 L68,298 L58,322 L28,308 L12,268 L15,232Z",
+    cx: 45, cy: 240,
+  },
+  // Central States
+  MP: {
+    d: "M158,240 L182,200 L210,200 L228,185 L262,185 L278,208 L282,252 L258,278 L195,278 L168,262Z",
+    cx: 218, cy: 238,
+  },
+  // Eastern States
+  BR: {
+    d: "M312,152 L355,138 L370,158 L352,178 L298,178 L298,172Z",
+    cx: 330, cy: 160,
+  },
+  JH: {
+    d: "M278,208 L298,178 L352,178 L352,218 L322,232 L285,222Z",
+    cx: 315, cy: 205,
+  },
+  WB: {
+    d: "M352,158 L382,142 L392,168 L388,228 L372,262 L358,248 L352,218 L352,178Z",
+    cx: 370, cy: 200,
+  },
+  OR: {
+    d: "M282,252 L322,232 L352,248 L362,282 L338,312 L295,302 L278,278Z",
+    cx: 320, cy: 275,
+  },
+  CT: {
+    d: "M258,278 L282,252 L295,302 L278,332 L248,325 L242,298Z",
+    cx: 268, cy: 298,
+  },
+  // Western/Southern States
+  MH: {
+    d: "M58,322 L68,298 L52,278 L72,252 L120,258 L158,240 L168,262 L195,278 L210,312 L198,348 L168,375 L128,370 L92,352 L72,338Z",
+    cx: 132, cy: 312,
+  },
+  GA: {
+    d: "M82,342 L95,338 L98,358 L85,362Z",
+    cx: 90, cy: 350,
+  },
+  TS: {
+    d: "M210,312 L242,298 L278,312 L272,352 L240,368 L210,355Z",
+    cx: 242, cy: 332,
+  },
+  // Southern States
+  KA: {
+    d: "M85,362 L128,370 L168,375 L175,398 L170,442 L148,468 L118,460 L92,432 L80,400Z",
+    cx: 125, cy: 418,
+  },
+  AP: {
+    d: "M210,355 L240,368 L272,352 L295,342 L318,362 L308,408 L275,440 L242,450 L210,435 L175,398 L168,375 L198,348Z",
+    cx: 245, cy: 395,
+  },
+  KL: {
+    d: "M92,432 L118,460 L148,468 L142,508 L128,528 L108,518 L92,478Z",
+    cx: 118, cy: 482,
+  },
+  TN: {
+    d: "M148,468 L170,442 L210,435 L242,450 L262,442 L275,458 L260,498 L228,535 L188,538 L155,530 L148,518 L142,508Z",
+    cx: 205, cy: 488,
+  },
+  // Northeast States
+  SK: {
+    d: "M365,118 L382,112 L388,128 L372,135Z",
+    cx: 377, cy: 123,
+  },
+  AS: {
+    d: "M395,112 L442,102 L455,120 L445,138 L408,142 L392,130Z",
+    cx: 422, cy: 122,
+  },
+  AR: {
+    d: "M418,82 L455,75 L462,98 L445,102 L422,100Z",
+    cx: 440, cy: 90,
+  },
+  ML: {
+    d: "M395,135 L425,128 L430,148 L400,155Z",
+    cx: 412, cy: 142,
+  },
+  NL: {
+    d: "M455,120 L472,118 L475,138 L458,142Z",
+    cx: 465, cy: 130,
+  },
+  MN: {
+    d: "M460,145 L478,142 L482,170 L465,175Z",
+    cx: 470, cy: 158,
+  },
+  MZ: {
+    d: "M448,165 L468,160 L472,195 L452,200Z",
+    cx: 460, cy: 180,
+  },
+  TR: {
+    d: "M428,175 L448,170 L452,200 L432,205Z",
+    cx: 440, cy: 188,
+  },
 };
 
 export const IndiaMap: React.FC = () => {
@@ -54,11 +154,12 @@ export const IndiaMap: React.FC = () => {
             Click a state to view election data
           </h3>
           <svg
-            viewBox="0 0 480 420"
-            className="w-full h-auto"
+            viewBox="0 0 500 580"
+            className="w-full h-auto max-h-[70vh]"
             role="img"
             aria-label="Interactive map of India showing states"
           >
+            {/* State shapes */}
             {Object.entries(statePathData).map(([code, { d }]) => {
               const state = statesData.find((s) => s.code === code);
               const isSelected = selectedState?.code === code;
@@ -67,21 +168,34 @@ export const IndiaMap: React.FC = () => {
                 <path
                   key={code}
                   d={d}
-                  fill={isSelected ? "var(--primary-500)" : isHovered ? "var(--accent-500)" : "var(--phase-pre)"}
-                  stroke="var(--bg-primary)"
+                  fill={
+                    isSelected
+                      ? "var(--primary-500)"
+                      : isHovered
+                      ? "var(--accent-500)"
+                      : "var(--phase-pre)"
+                  }
+                  stroke="var(--bg-card)"
                   strokeWidth="1.5"
-                  opacity={isSelected ? 1 : isHovered ? 0.9 : 0.6}
+                  opacity={isSelected ? 1 : isHovered ? 0.85 : 0.65}
                   className="cursor-pointer transition-all duration-200"
                   onClick={() => handleStateClick(code)}
                   onMouseEnter={() => setHoveredCode(code)}
                   onMouseLeave={() => setHoveredCode(null)}
                   role="button"
                   tabIndex={0}
-                  aria-label={state ? `${state.name} — ${state.lokSabhaSeats} Lok Sabha seats` : code}
-                  onKeyDown={(e) => { if (e.key === "Enter") handleStateClick(code); }}
+                  aria-label={
+                    state
+                      ? `${state.name} — ${state.lokSabhaSeats} Lok Sabha seats`
+                      : code
+                  }
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleStateClick(code);
+                  }}
                 />
               );
             })}
+            {/* State labels */}
             {Object.entries(statePathData).map(([code, { cx, cy }]) => (
               <text
                 key={`label-${code}`}
@@ -91,22 +205,34 @@ export const IndiaMap: React.FC = () => {
                 dominantBaseline="central"
                 className="pointer-events-none select-none"
                 fill="white"
-                fontSize="7"
+                fontSize="8"
                 fontWeight="bold"
               >
                 {code}
               </text>
             ))}
           </svg>
-          <div className="flex justify-center gap-4 mt-4 text-xs text-foreground-secondary">
-            <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded-sm" style={{ backgroundColor: "var(--phase-pre)", opacity: 0.6 }} /> State
+          <div className="flex justify-center gap-6 mt-4 text-xs text-foreground-secondary">
+            <span className="flex items-center gap-1.5">
+              <span
+                className="w-3 h-3 rounded-sm"
+                style={{ backgroundColor: "var(--phase-pre)", opacity: 0.65 }}
+              />{" "}
+              State
             </span>
-            <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded-sm" style={{ backgroundColor: "var(--accent-500)" }} /> Hover
+            <span className="flex items-center gap-1.5">
+              <span
+                className="w-3 h-3 rounded-sm"
+                style={{ backgroundColor: "var(--accent-500)" }}
+              />{" "}
+              Hover
             </span>
-            <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded-sm" style={{ backgroundColor: "var(--primary-500)" }} /> Selected
+            <span className="flex items-center gap-1.5">
+              <span
+                className="w-3 h-3 rounded-sm"
+                style={{ backgroundColor: "var(--primary-500)" }}
+              />{" "}
+              Selected
             </span>
           </div>
         </div>
@@ -119,7 +245,8 @@ export const IndiaMap: React.FC = () => {
           <div className="bg-bg-card border border-border rounded-xl p-8 text-center h-full flex flex-col items-center justify-center">
             <span className="text-4xl mb-4">🗺️</span>
             <p className="text-foreground-secondary text-sm">
-              Click on any state in the map to view its election data, Lok Sabha seats, voter turnout, and current government.
+              Click on any state in the map to view its election data, Lok Sabha
+              seats, voter turnout, and current government.
             </p>
           </div>
         )}
