@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { EVMMachine } from "@/components/vote/EVMMachine";
 import { VVPATSlip } from "@/components/vote/VVPATSlip";
@@ -19,40 +19,18 @@ import {
   RotateCcw,
 } from "lucide-react";
 import Link from "next/link";
-
-const candidates = [
-  { id: 1, name: "Candidate A", party: "Party of the People", symbol: "🌾" },
-  { id: 2, name: "Candidate B", party: "National Progress Front", symbol: "🌻" },
-  { id: 3, name: "Candidate C", party: "Democratic Reform Alliance", symbol: "📖" },
-  { id: 4, name: "Candidate D", party: "Green Development Party", symbol: "🌳" },
-  { id: 5, name: "Candidate E", party: "Independent", symbol: "🕊️" },
-  { id: 6, name: "NOTA", party: "None Of The Above", symbol: "🚫" },
-];
+import { useVoteSimulation, STEP_LABELS } from "@/hooks/useVoteSimulation";
+import { useAnalytics } from "@/hooks/useAnalytics";
 
 const stepIcons = [ShieldCheck, Fingerprint, Droplets, Vote, FileCheck, DoorOpen, PartyPopper];
 
 export default function VotePage() {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [votedCandidate, setVotedCandidate] = useState<(typeof candidates)[0] | null>(null);
-  const [showConfetti, setShowConfetti] = useState(false);
+  const { currentStep, votedCandidate, showConfetti, handleVote, handleReset, goNext } = useVoteSimulation();
+  const { trackVoteComplete } = useAnalytics();
 
-  const handleVote = (candidateId: number) => {
-    const candidate = candidates.find((c) => c.id === candidateId);
-    if (!candidate) return;
-    setVotedCandidate(candidate);
-    setCurrentStep(4);
-  };
-
-  const handleReset = () => {
-    setCurrentStep(0);
-    setVotedCandidate(null);
-    setShowConfetti(false);
-  };
-
-  const goNext = () => {
-    const next = currentStep + 1;
-    setCurrentStep(next);
-    if (next === 6) setShowConfetti(true);
+  const onVote = (candidateId: number) => {
+    handleVote(candidateId);
+    trackVoteComplete();
   };
 
   const slideVariants = {
@@ -186,7 +164,7 @@ export default function VotePage() {
                   Press the blue button next to your chosen candidate
                 </p>
               </div>
-              <EVMMachine onVote={handleVote} hasVoted={false} />
+              <EVMMachine onVote={onVote} hasVoted={false} />
             </motion.div>
           )}
 
@@ -281,7 +259,7 @@ export default function VotePage() {
 
         {/* Step labels */}
         <div className="mt-8 grid grid-cols-7 gap-1 text-center">
-          {["Welcome", "ID Check", "Ink", "EVM", "VVPAT", "Exit", "Done"].map((label, i) => {
+          {STEP_LABELS.map((label, i) => {
             const Icon = stepIcons[i];
             return (
               <div key={label} className={`text-xs ${i <= currentStep ? "text-primary-600 dark:text-primary-400" : "text-foreground-muted"}`}>

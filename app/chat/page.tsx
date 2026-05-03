@@ -8,20 +8,28 @@ import { useChat } from "@/hooks/useChat";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Trash2 } from "lucide-react";
+import { useAnalytics } from "@/hooks/useAnalytics";
 
 function ChatPageInner() {
   const { messages, isLoading, error, sendMessage, clearHistory } = useChat();
+  const { trackChatMessage } = useAnalytics();
   const searchParams = useSearchParams();
   const hasAutoSent = useRef(false);
   const [showClearModal, setShowClearModal] = React.useState(false);
+
+  const handleSend = async (text: string) => {
+    trackChatMessage();
+    await sendMessage(text);
+  };
 
   useEffect(() => {
     const q = searchParams.get("q");
     if (q && !hasAutoSent.current && messages.length === 0) {
       hasAutoSent.current = true;
-      sendMessage(q);
+      handleSend(q);
     }
-  }, [searchParams, sendMessage, messages.length]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, messages.length]);
 
   const handleClearChat = () => {
     clearHistory();
@@ -42,7 +50,7 @@ function ChatPageInner() {
         )}
       </div>
 
-      <ChatWindow messages={messages} isLoading={isLoading} onSend={sendMessage} />
+      <ChatWindow messages={messages} isLoading={isLoading} onSend={handleSend} />
 
       <div className="p-4 md:p-6 bg-bg-primary border-t border-border mt-auto">
         {error && (
@@ -52,7 +60,7 @@ function ChatPageInner() {
           </div>
         )}
         <div className="max-w-3xl mx-auto w-full">
-          <ChatInput onSend={sendMessage} isLoading={isLoading} />
+          <ChatInput onSend={handleSend} isLoading={isLoading} />
           <p className="text-xs text-center text-foreground-muted mt-3">
             NirvaachanAI can make mistakes. Please verify important information on the official ECI website.
           </p>
