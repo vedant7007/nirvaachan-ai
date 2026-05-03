@@ -1,0 +1,16 @@
+{
+  "name": "NirvaachanAI",
+  "short_name": "NirvaachanAI",
+  "description": "AI-powered Election Process Education for India",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAFAF9",
+  "theme_color": "#F97316",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}

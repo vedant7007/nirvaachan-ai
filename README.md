@@ -1,36 +1,88 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NirvaachanAI — Democracy, Decoded 🗳️🇮🇳
 
-## Getting Started
+> An AI-powered interactive platform that helps Indian citizens understand
+> the election process through conversation, visualization, and gamification.
 
-First, run the development server:
+**Built for PromptWars Virtual 2026 | Powered by Google Gemini**
+
+## ✨ Features
+
+- **🤖 AI Chatbot** — Ask anything about Indian elections in Hindi or English
+- **🗓️ Interactive Timeline** — 12-step visual election process journey
+- **📝 Knowledge Quiz** — 15 questions across Easy/Medium/Hard levels
+- **✅ Eligibility Checker** — Check if you're eligible to vote with next steps
+- **📰 Live Election News** — AI-curated latest election updates
+- **📍 My Constituency** — Find your constituency and representatives
+- **🗺️ India Election Map** — Click any state for election data
+- **🗳️ Mock Voting Booth** — Experience voting on a simulated EVM
+- **📖 Election Glossary** — 50+ election terms explained simply
+- **⚖️ Know Your Rights** — Your rights as an Indian voter
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Next.js 14, TypeScript, Tailwind CSS, Framer Motion |
+| AI | Google Gemini 2.0 Flash API |
+| Auth | Firebase Authentication |
+| Database | Cloud Firestore |
+| Analytics | Google Analytics 4 |
+| Deployment | Google Cloud Run |
+| Testing | Vitest + React Testing Library |
+
+## 🚀 Quick Start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/vedant7007/nirvaachan-ai.git
+cd nirvaachan-ai
+npm install
+cp .env.example .env.local  # Fill in your API keys
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🧪 Testing
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run test         # Run all tests
+npm run test:coverage # With coverage report
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🐳 Docker
 
-## Learn More
+```bash
+docker build -t nirvaachan-ai .
+docker run -p 8080:8080 --env-file .env.local nirvaachan-ai
+```
 
-To learn more about Next.js, take a look at the following resources:
+## ☁️ Deploy to Cloud Run
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+gcloud builds submit --tag gcr.io/PROJECT_ID/nirvaachan-ai
+gcloud run deploy nirvaachan-ai --image gcr.io/PROJECT_ID/nirvaachan-ai --region asia-south1
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📊 Scoring Criteria
 
-## Deploy on Vercel
+| Criteria | Approach |
+|----------|----------|
+| Code Quality | TypeScript strict, component decomposition, ESLint |
+| Security | API proxy, input sanitization, rate limiting, CSP headers |
+| Efficiency | SSG, lazy loading, streaming, minimal deps |
+| Testing | 10+ test files, 70%+ coverage on logic |
+| Accessibility | WCAG AA, semantic HTML, ARIA, keyboard nav |
+| Google Services | Gemini, Firebase Auth, Firestore, GA4, Cloud Run |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 👤 Author
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Vedant Manmath Idlgave**
+- B.Tech CSE, VJIT Hyderabad (2024-2028)
+- GitHub: [vedant7007](https://github.com/vedant7007)
+- LinkedIn: [vedant-idlgave](https://linkedin.com/in/vedant-idlgave-1514323063103vtsd)
+
+## 📝 License
+
+MIT
+
+## ⚠️ Disclaimer
+
+This is an educational tool built for the PromptWars 2026 hackathon. For official election information, please visit [eci.gov.in](https://eci.gov.in).
